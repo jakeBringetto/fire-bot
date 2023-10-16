@@ -7,13 +7,13 @@ from dotenv import dotenv_values
 
 # Create pinecone index
 def create_pinecone():
-    config = dotenv_values(".env")
-    pc.init(api_key=config['PINECONE_API_KEY'], environment="env") 
-    pc.create_index("fireQuery", dimension=384)
+    # config = dotenv_values("../.env")
+    pc.create_index("fire-query", dimension=384)
+    pc.describe_index("fire-query")
 
 # Insert 
 def insert_pincone(data, model):
-    index = pc.GRPCIndex("fireQuery")
+    index = pc.Index("fire-query")
     upserted_data = []
     i=0
     for item in data:
@@ -32,11 +32,12 @@ def insert_pincone(data, model):
 
 # initialize database
 def init_db():
-    data = pd.process_files()
+    data = pd.csv_to_array()
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    create_pinecone()
+    # create_pinecone()
     insert_pincone(data, model)
 
 if __name__ == "__main__":
-    load_dotenv()
+    config = dotenv_values("../.env")
+    pc.init(api_key=config["PINECONE_API_KEY"], environment="gcp-starter")
     init_db()
